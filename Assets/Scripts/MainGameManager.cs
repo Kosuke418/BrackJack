@@ -76,33 +76,16 @@ public class MainGameManager : MonoBehaviour
     {
         if (turn == 1)
         {
-            if (playerNum == 21)
-            {
-                turn = 5;
-            }
-            else if (playerNum >= 22)
-            {
-                turn = 3;
-            }
+            Results();
         }
 
         if (turn == 2)
         {
             while (true)
             {
-                if (dealerNum == 21)
+                if (dealerNum >= 17)
                 {
-                    turn = 5;
-                    break;
-                }
-                else if (dealerNum >= 22)
-                {
-                    turn = 5;
-                    break;
-                }
-                else if (dealerNum >= 17)
-                {
-                    turn = 5;
+                    Results();
                     break;
                 }
                 else
@@ -110,19 +93,6 @@ public class MainGameManager : MonoBehaviour
                     GenerateCard(2);
                 }
             }
-        }
-
-        if (turn == 5)
-        {
-            Results();
-        }
-        else if (turn == 3)
-        {
-            PlayerLose();
-        }
-        else if (turn == 4)
-        {
-            PlayerWin();
         }
     }
 
@@ -150,6 +120,10 @@ public class MainGameManager : MonoBehaviour
         else if (dealerNum > 21)
         {
             PlayerWin();
+        }
+        else if (playerNum > 21)
+        {
+            PlayerLose();
         }
         else if (playerNum == dealerNum)
         {
