@@ -76,7 +76,10 @@ public class MainGameManager : MonoBehaviour
     {
         if (turn == 1)
         {
-            Results();
+            if (playerNum >= 21)
+            {
+                Results();
+            }
         }
 
         if (turn == 2)
