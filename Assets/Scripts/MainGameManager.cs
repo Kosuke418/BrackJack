@@ -2,9 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MainGameManager : MonoBehaviour
 {
+    public AnimationCurve scaleCurve;　　//AnimationCurveを外部参照します　scaleCurveという名で以下のスクリプトでは記載します。
+    public float duration = 0.5f;　　　　// duration というフロートの値（の宣言）は0.5です。
+
+    private void Awake()
+    {
+    }
+
+    public void FlipCard(GameObject card)　　//メソッドの宣言FlipCard()
+    {
+        StartCoroutine(Flip(card));　　　//新たにコールーチン（この場合今回のアニメーション処理）を始めます。
+    }
+    IEnumerator Flip(GameObject card)　　//コールーチンで動くメソッドFlipの定義。
+    {
+        card.GetComponent<CardManager>().FaceorBack(false);　　// SpriteRenderでスプライトの最初のイメージ（引数で与えられたもの）をレンダー
+
+        float time = 0f;　　　　　　　// 小数点の値の宣言と０の代入
+        while (time <= 1f)　　　　　　// time が１と等しいか小さい場合下記処理を繰り返す
+        {
+            float scale = scaleCurve.Evaluate(time);　　　　//小数点scale の宣言とtimeに対応するAnimationCurveグラフでのScaleの値の代入。
+            time = time + Time.deltaTime / duration;　　　　//time に　time+PCの単位時間をdurationで割ったものを代入
+
+            Vector3 localScale = transform.localScale;　　//localScaleというVector3の宣言と現在のtransformlocalScaleの値の代入。
+            localScale.x = scale;　　　　　　　　　　　　　//localScaleのx成分だけ上で定義したscaleを代入する。
+            card.transform.localScale = localScale;　　　　　　//現在のtransformにx成分変更後のlocalscaleを代入する。
+
+            if (time >= 0.5f)                     //もしtimeが0.5以上の場合
+            {
+                card.GetComponent<CardManager>().FaceorBack(true);　  　　//次の面をレンダー
+            }
+            yield return new WaitForFixedUpdate();　　// 一定間隔待って次のwhile処理に移ります。
+        }
+    }
+
     List<int> shuffleDeck = new List<int>();
     List<GameObject> playerCard = new List<GameObject>();
     List<GameObject> dealerCard = new List<GameObject>();
@@ -145,21 +179,21 @@ public class MainGameManager : MonoBehaviour
     void PlayerWin()
     {
         dealerNumText.enabled = true;
-        dealerCard[0].GetComponent<CardManager>().FaceOrBack(true);
+        dealerCard[0].GetComponent<CardManager>().FaceorBack(true);
         playerNumText.text = playerNum.ToString() + "-Player win!!";
     }
 
     void PlayerLose()
     {
         dealerNumText.enabled = true;
-        dealerCard[0].GetComponent<CardManager>().FaceOrBack(true);
+        dealerCard[0].GetComponent<CardManager>().FaceorBack(true);
         playerNumText.text = playerNum.ToString() + "-Player lose!!";
     }
 
     void Draw()
     {
         dealerNumText.enabled = true;
-        dealerCard[0].GetComponent<CardManager>().FaceOrBack(true);
+        dealerCard[0].GetComponent<CardManager>().FaceorBack(true);
         playerNumText.text = playerNum.ToString() + "-Draw!!";
     }
 
@@ -188,7 +222,7 @@ public class MainGameManager : MonoBehaviour
                 playerNum -= 10;
                 playerAce = false;
             }
-            playerCard[playerGenerateNum].GetComponent<CardManager>().FaceOrBack(true);
+            FlipCard(playerCard[playerGenerateNum]);
             playerGenerateNum++;
             cardNum++;
             if (playerAce)
@@ -224,7 +258,10 @@ public class MainGameManager : MonoBehaviour
                 dealerNum -= 10;
                 dealerAce = false;
             }
-            dealerCard[dealerGenerateNum].GetComponent<CardManager>().FaceOrBack(true);
+            if (dealerGenerateNum != 0)
+            {
+                FlipCard(dealerCard[dealerGenerateNum]);
+            }
             dealerGenerateNum++;
             cardNum++;
             if (dealerAce)
@@ -246,15 +283,15 @@ public class MainGameManager : MonoBehaviour
         GenerateCard(1);
         GenerateCard(2);
         GenerateCard(2);
-        dealerCard[0].GetComponent<CardManager>().FaceOrBack(false);
+        dealerCard[0].GetComponent<CardManager>().FaceorBack(false);
         BlackJack();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            Application.LoadLevel("Main");
+            SceneManager.LoadScene("Main");
         }
         if (Input.GetKeyDown(KeyCode.H))
         {
